@@ -41,14 +41,14 @@
 
 | <p style="color: purple;">TAGS</p> | <p style="color: purple">EXPLAIN<p>                                                                                                           |
 | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ADDED**                          | It gives information about newly added Component, package and files.                                                                          |
-| **CREATED**                        | It gives information about the Component, package and files created for the first time.                                                       |
-| **CHANGED**                        | It gives information about the changed function or method related to the problem or design.                                                   |
-| **REMOVED**                        | It gives information about the removed function or method related to the problem or design.                                                   |
-| **UPDATED**                        | It gives information about the updated function or method related to the problem or design.                                                   |
-| **FIXED**                          | It gives information about the solution of the problem caused by the problem.                                                                 |
-| **TODO**                           | It gives information about the planned and encountered problem in the future.                                                                 |
-| **TEST**                           | It is a tag created to test whether the functions added during build or for projects working in separate environments can work synchronously. |
+| **ADDED (username)**                          | It gives information about newly added Component, package and files.                                                                          |
+| **CREATED (username)**                        | It gives information about the Component, package and files created for the first time.                                                       |
+| **CHANGED (username)**                        | It gives information about the changed function or method related to the problem or design.                                                   |
+| **REMOVED (username)**                        | It gives information about the removed function or method related to the problem or design.                                                   |
+| **UPDATED (username)**                        | It gives information about the updated function or method related to the problem or design.                                                   |
+| **FIXED (username)**                          | It gives information about the solution of the problem caused by the problem.                                                                 |
+| **TODO (username)**                           | It gives information about the planned and encountered problem in the future.                                                                 |
+| **TEST (username)**                           | It is a tag created to test whether the functions added during build or for projects working in separate environments can work synchronously. |
 
 </details>
 <!-- ABOUT THE PROJECT -->
