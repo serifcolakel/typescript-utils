@@ -8,7 +8,9 @@ This example shows how to use generic arguments in a function. The function is c
 
 # References
 
-> [https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-arguments](Generic arguments)
-> [https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype](Extract utility type)
-> [https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints](Generic constraints)
+> [Generic Arguments](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-arguments)
+
+> [Extract utility type](https://www.typescriptlang.org/docs/handbook/utility-types.html#extracttype)
+
+> [Generic constraints](https://www.typescriptlang.org/docs/handbook/2/generics.html#generic-constraints)
 
