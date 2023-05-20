@@ -5,7 +5,8 @@ type LoginPayload = {
 
 type LoginResult = {
   status: "success" | "fail";
-  data: {
+  message?: string;
+  data?: {
     token: string;
   };
 };
@@ -33,60 +34,86 @@ type DeleteNoteResult = {
   status: "success" | "fail";
 };
 
+const types = {
+  LOG_IN: "LOG_IN",
+  SIGN_OUT: "SIGN_OUT",
+  ADD_NOTE: "ADD_NOTE",
+  DELETE_NOTE: "DELETE_NOTE",
+} as const;
+
 type Requests =
-  | { type: "LOG_IN"; payload: LoginPayload }
-  | { type: "SIGN_OUT" }
-  | { type: "ADD_NOTE"; payload: AddNotePayload }
-  | { type: "DELETE_NOTE"; payload: DeleteNotePayload };
+  | { service: typeof types.LOG_IN; requestBody: LoginPayload }
+  | { service: typeof types.SIGN_OUT }
+  | { service: typeof types.ADD_NOTE; requestBody: AddNotePayload }
+  | { service: typeof types.DELETE_NOTE; requestBody: DeleteNotePayload };
 
 type Responses =
-  | { type: "LOG_IN"; result: LoginResult }
-  | { type: "SIGN_OUT"; result: SignOutResult }
-  | { type: "ADD_NOTE"; result: AddNoteResult }
-  | { type: "DELETE_NOTE"; result: DeleteNoteResult };
+  | { service: typeof types.LOG_IN; responseBody: LoginResult }
+  | { service: typeof types.SIGN_OUT; responseBody: SignOutResult }
+  | { service: typeof types.ADD_NOTE; responseBody: AddNoteResult }
+  | { service: typeof types.DELETE_NOTE; responseBody: DeleteNoteResult };
 
-const sendRequestWithGenericArgument = <T extends Requests["type"]>(
-  ...args: Extract<Requests, { type: T }> extends { payload: infer TPayload } // ? if payload exist & infer TPayload from payload return [type: T, payload: TPayload]
-    ? [type: T, payload: TPayload]
-    : [type: T] // ? else return [type: T]
-): Responses => {
-  const [type, payload] = args;
-  switch (type) {
+const generalServiceActions = async <T extends Requests["service"]>(
+  ...args: Extract<Requests, { service: T }> extends { requestBody: infer TPayload }
+    ? [service: T, requestBody: TPayload]
+    : [service: T] // ? else return [type: T]
+): Promise<Responses> => {
+  const [service, requestBody] = args;
+  
+  switch (service) {
     case "LOG_IN":
-      console.log({ type, payload });
+      const res = fetch("https://example.com/login", {
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      }).then((res) => res.json()).then((res:LoginResult) => res);
+      
+      if ((await res).status === "fail") {
+        return {
+          service,
+          responseBody: {
+            status: 'fail',
+            message: 'Login failed'
+          },
+        }
+        // throw new Error("Login failed");
+      }
+
       return {
-        type,
-        result: {
-          status: "success",
+        service,
+        responseBody: {
+          status: (await res).status,
+          message: (await res)?.message ?? '',
           data: {
-            token: "1qweqwe125230",
+            token: (await res)?.data?.token ?? '',
           },
         },
       };
     case "SIGN_OUT":
-      console.log({ type, payload });
+      console.log({ service, requestBody });
       return {
-        type,
-        result: {
+        service,
+        responseBody: {
           status: "success",
         },
       };
     case "ADD_NOTE":
-      console.log({ type, payload });
+      console.log({ service, requestBody });
+      // ? fetch data here and return response
       return {
-        type,
-        result: {
-          status: "success",
+        service,
+        responseBody: {
+          status: "success", // ? check if response is success or fail
           data: {
-            noteId: "123",
+            noteId: "123", // ? return noteId
           },
         },
       };
     case "DELETE_NOTE":
-      console.log({ type, payload });
+      console.log({ service, requestBody });
+      // ? fetch data here and return response
       return {
-        type,
-        result: {
+        service,
+        responseBody: {
           status: "success",
         },
       };
@@ -96,21 +123,49 @@ const sendRequestWithGenericArgument = <T extends Requests["type"]>(
   }
 };
 
-const loginResult = sendRequestWithGenericArgument("LOG_IN", {
-  userName: "test",
-  password: "test",
+const loginResult = generalServiceActions("ADD_NOTE", {
+  note: '125125125'
 });
 console.log({ loginResult });
 
-const signOutResult = sendRequestWithGenericArgument("SIGN_OUT");
+const signOutResult = generalServiceActions("SIGN_OUT");
 console.log({ signOutResult });
 
-const addNoteResult = sendRequestWithGenericArgument("ADD_NOTE", {
+const addNoteResult = generalServiceActions("ADD_NOTE", {
   note: "Take out the trash",
 });
 console.log({ addNoteResult });
 
-const deleteNoteResult = sendRequestWithGenericArgument("DELETE_NOTE", {
+const deleteNoteResult = generalServiceActions("DELETE_NOTE", {
   noteId: "note-123",
 });
 console.log({ deleteNoteResult });
+
+
+type OnlyLoginResponse = Extract<Responses, { service: "LOG_IN" }>['responseBody']
+
+const dims = {
+  keyValue: '0',
+  object: '1',
+  Array: '2',
+}  as const;
+
+// dims type must be '0' | '1' | '2'
+type Dims = keyof typeof dims;
+type Values = typeof dims[Dims];
+
+type DimTypes = {
+  keyValue: {
+    key: string,
+    value: string
+    dim: Values
+  },
+}
+
+const dimTypes: DimTypes = {
+  keyValue: {
+    dim: '1',
+    key: '1',
+    value: '1'
+  }
+}
