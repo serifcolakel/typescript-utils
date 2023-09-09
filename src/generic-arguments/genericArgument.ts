@@ -54,41 +54,47 @@ type Responses =
   | { service: typeof types.DELETE_NOTE; responseBody: DeleteNoteResult };
 
 const generalServiceActions = async <T extends Requests["service"]>(
-  ...args: Extract<Requests, { service: T }> extends { requestBody: infer TPayload }
+  ...args: Extract<Requests, { service: T }> extends {
+    requestBody: infer TPayload;
+  }
     ? [service: T, requestBody: TPayload]
     : [service: T] // ? else return [type: T]
 ): Promise<Responses> => {
   const [service, requestBody] = args;
-  
+
   switch (service) {
-    case "LOG_IN":
-      const res = fetch("https://example.com/login", {
+    case types.LOG_IN:
+      // INFO (serif) : fetch data here and return response YOUR_LOGIC_HERE
+      const res = await fetch("https://example.com/", {
         method: "POST",
         body: JSON.stringify(requestBody),
-      }).then((res) => res.json()).then((res:LoginResult) => res);
-      
-      if ((await res).status === "fail") {
+      });
+
+      const data = await res.json();
+
+      if (data.status === "fail") {
+        // throw new Error("Login failed");
+
         return {
           service,
           responseBody: {
-            status: 'fail',
-            message: 'Login failed'
+            status: "fail",
+            message: "Login failed",
           },
-        }
-        // throw new Error("Login failed");
+        };
       }
 
       return {
         service,
         responseBody: {
-          status: (await res).status,
-          message: (await res)?.message ?? '',
+          status: data.status,
+          message: data?.message ?? "",
           data: {
-            token: (await res)?.data?.token ?? '',
+            token: data?.data?.token ?? "",
           },
         },
       };
-    case "SIGN_OUT":
+    case types.SIGN_OUT:
       console.log({ service, requestBody });
       return {
         service,
@@ -96,7 +102,7 @@ const generalServiceActions = async <T extends Requests["service"]>(
           status: "success",
         },
       };
-    case "ADD_NOTE":
+    case types.ADD_NOTE:
       console.log({ service, requestBody });
       // ? fetch data here and return response
       return {
@@ -108,7 +114,7 @@ const generalServiceActions = async <T extends Requests["service"]>(
           },
         },
       };
-    case "DELETE_NOTE":
+    case types.DELETE_NOTE:
       console.log({ service, requestBody });
       // ? fetch data here and return response
       return {
@@ -123,49 +129,50 @@ const generalServiceActions = async <T extends Requests["service"]>(
   }
 };
 
-const loginResult = generalServiceActions("ADD_NOTE", {
-  note: '125125125'
-});
-console.log({ loginResult });
+(async () => {
+  const loginResult = generalServiceActions("ADD_NOTE", {
+    note: "125125125",
+  });
+  console.log({ loginResult });
 
-const signOutResult = generalServiceActions("SIGN_OUT");
-console.log({ signOutResult });
+  const signOutResult = generalServiceActions("SIGN_OUT");
+  console.log({ signOutResult });
 
-const addNoteResult = generalServiceActions("ADD_NOTE", {
-  note: "Take out the trash",
-});
-console.log({ addNoteResult });
+  const addNoteResult = generalServiceActions("ADD_NOTE", {
+    note: "Take out the trash",
+  });
+  console.log({ addNoteResult });
 
-const deleteNoteResult = generalServiceActions("DELETE_NOTE", {
-  noteId: "note-123",
-});
-console.log({ deleteNoteResult });
+  const deleteNoteResult = generalServiceActions("DELETE_NOTE", {
+    noteId: "note-123",
+  });
+  console.log({ deleteNoteResult });
+})();
 
+type OnlyLoginRequest = Extract<Requests, { service: "LOG_IN" }>;
 
-type OnlyLoginResponse = Extract<Responses, { service: "LOG_IN" }>['responseBody']
+type OnlySignOutRequest = Extract<Requests, { service: "SIGN_OUT" }>;
 
-const dims = {
-  keyValue: '0',
-  object: '1',
-  Array: '2',
-}  as const;
+type OnlyAddNoteRequest = Extract<Requests, { service: "ADD_NOTE" }>;
 
-// dims type must be '0' | '1' | '2'
-type Dims = keyof typeof dims;
-type Values = typeof dims[Dims];
+type OnlyDeleteNoteRequest = Extract<Requests, { service: "DELETE_NOTE" }>;
 
-type DimTypes = {
-  keyValue: {
-    key: string,
-    value: string
-    dim: Values
-  },
-}
+type OnlyLoginResponse = Extract<
+  Responses,
+  { service: "LOG_IN" }
+>["responseBody"];
 
-const dimTypes: DimTypes = {
-  keyValue: {
-    dim: '1',
-    key: '1',
-    value: '1'
-  }
-}
+type OnlySignOutResponse = Extract<
+  Responses,
+  { service: "SIGN_OUT" }
+>["responseBody"];
+
+type OnlyAddNoteResponse = Extract<
+  Responses,
+  { service: "ADD_NOTE" }
+>["responseBody"];
+
+type OnlyLoginResponse2 = Extract<
+  Responses,
+  { service: "LOG_IN" }
+>["responseBody"];
